@@ -5,6 +5,6 @@ from mader.settings import Settings
 engine = create_async_engine(Settings().DATABASE_URL)
 
 
-def get_session():
-    with AsyncSession(engine) as session:
+async def get_session():
+    async with AsyncSession(engine) as session:
         yield session
