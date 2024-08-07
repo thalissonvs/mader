@@ -19,6 +19,24 @@ def test_create_user(client):
     }
 
 
+def test_create_user_sanitize_username(client):
+    response = client.post(
+        '/users/',
+        json={
+            'username': 'Maria  do Carmo%$$@',
+            'email': 'test@email.com',
+            'password': 'password',
+        },
+    )
+
+    assert response.status_code == HTTPStatus.CREATED
+    assert response.json() == {
+        'id': 1,
+        'username': 'maria do carmo',
+        'email': 'test@email.com',
+    }
+
+
 def test_create_user_with_existing_username(client, user):
     response = client.post(
         '/users/',
