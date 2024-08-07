@@ -19,7 +19,7 @@ T_Session = Annotated[AsyncSession, Depends(get_session)]
 T_Oauth2Form = Annotated[OAuth2PasswordRequestForm, Depends()]
 
 
-@router.get('/token', response_model=TokenSchema)
+@router.post('/token', response_model=TokenSchema)
 async def login_for_access_token(form_data: T_Oauth2Form, session: T_Session):
     user = await session.scalar(
         select(User).where(User.email == form_data.username)
@@ -34,7 +34,7 @@ async def login_for_access_token(form_data: T_Oauth2Form, session: T_Session):
     return {'access_token': access_token, 'token_type': 'Bearer'}
 
 
-@router.get('/refresh_token', response_model=TokenSchema)
+@router.post('/refresh_token', response_model=TokenSchema)
 def refresh_access_token(current_user: User = Depends(get_current_user)):
     access_token = create_access_token({'sub': current_user.email})
     return {'access_token': access_token, 'token_type': 'Bearer'}

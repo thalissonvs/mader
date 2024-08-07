@@ -6,7 +6,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jwt import ExpiredSignatureError, PyJWTError, decode, encode
 from pwdlib import PasswordHash
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from zoneinfo import ZoneInfo
 
 from mader.database import get_session
@@ -15,7 +15,7 @@ from mader.settings import Settings
 
 pwd_context = PasswordHash.recommended()
 settings = Settings()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='auth/token')
 
 
 def get_password_hash(password: str) -> str:
@@ -35,8 +35,8 @@ def create_access_token(data: dict) -> str:
     return encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
 
-def get_current_user(
-    session: Session = Depends(get_session),
+async def get_current_user(
+    session: AsyncSession = Depends(get_session),
     token: str = Depends(oauth2_scheme),
 ):
     credentials_exception = HTTPException(
@@ -55,7 +55,7 @@ def get_current_user(
     except PyJWTError:
         raise credentials_exception
 
-    user_db = session.scalar(select(User).where(User.email == email))
+    user_db = await session.scalar(select(User).where(User.email == email))
     if user_db is None:
         raise credentials_exception
 
