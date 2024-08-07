@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from mader.routers import users, auth
+from mader.routers import auth, users
 
 app = FastAPI()
 app.include_router(users.router)

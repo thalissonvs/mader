@@ -60,14 +60,7 @@ async def delete_user(
             detail='Unauthorized',
         )
 
-    db_user = await session.get(User, user_id)
-    if not db_user:
-        raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND,
-            detail='User not found',
-        )
-
-    session.delete(db_user)
+    await session.delete(current_user)
     await session.commit()
     return {'message': 'User deleted'}
 
@@ -85,19 +78,12 @@ async def update_user(
             detail='Unauthorized',
         )
 
-    db_user = await session.scalar(select(User).where(User.id == user_id))
-    if not db_user:
-        raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND,
-            detail='User not found',
-        )
-
     sanitized_username = sanitize_username(user.username)
 
-    db_user.username = sanitized_username
-    db_user.email = user.email
-    db_user.password = get_password_hash(user.password)
+    current_user.username = sanitized_username
+    current_user.email = user.email
+    current_user.password = get_password_hash(user.password)
     await session.commit()
-    await session.refresh(db_user)
+    await session.refresh(current_user)
 
-    return db_user
+    return current_user

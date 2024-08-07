@@ -24,7 +24,7 @@ def test_create_user_with_existing_username(client, user):
         '/users/',
         json={
             'username': user.username,
-            'email': 'email2@mail.com',
+            'email': 'test2@mail.com',
             'password': 'password',
         },
     )
@@ -71,19 +71,23 @@ def test_get_users_with_user(client, user):
     }
 
 
-def test_delete_user(client, user):
-    response = client.delete(f'/users/{user.id}')
+def test_delete_user(client, user, token):
+    response = client.delete(
+        f'/users/{user.id}', headers={'Authorization': f'Bearer {token}'}
+    )
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {'message': 'User deleted'}
 
 
-def test_delete_user_error(client):
-    response = client.delete('/users/1')
-    assert response.status_code == HTTPStatus.NOT_FOUND
-    assert response.json() == {'detail': 'User not found'}
+def test_delete_user_error(client, other_user, token):
+    response = client.delete(
+        f'/users/{other_user.id}', headers={'Authorization': f'Bearer {token}'}
+    )
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
+    assert response.json() == {'detail': 'Unauthorized'}
 
 
-def test_update_user(client, user):
+def test_update_user(client, user, token):
     response = client.put(
         f'/users/{user.id}',
         json={
@@ -91,6 +95,7 @@ def test_update_user(client, user):
             'email': 'test2@mail.com',
             'password': 'password2',
         },
+        headers={'Authorization': f'Bearer {token}'},
     )
 
     assert response.status_code == HTTPStatus.OK
@@ -101,15 +106,16 @@ def test_update_user(client, user):
     }
 
 
-def test_update_user_error(client):
+def test_update_user_error(client, other_user, token):
     response = client.put(
-        '/users/1',
+        f'/users/{other_user.id}',
         json={
             'username': 'test2',
             'email': 'test2@mail.com',
             'password': 'password2',
         },
+        headers={'Authorization': f'Bearer {token}'},
     )
 
-    assert response.status_code == HTTPStatus.NOT_FOUND
-    assert response.json() == {'detail': 'User not found'}
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
+    assert response.json() == {'detail': 'Unauthorized'}
