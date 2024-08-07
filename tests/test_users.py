@@ -29,9 +29,9 @@ def test_create_user_with_existing_username(client, user):
         },
     )
 
-    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert response.status_code == HTTPStatus.CONFLICT
     assert response.json() == {
-        'detail': 'User with this username already exists',
+        'detail': 'User already exists in the MADR',
     }
 
 
@@ -45,9 +45,9 @@ def test_create_user_with_existing_email(client, user):
         },
     )
 
-    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert response.status_code == HTTPStatus.CONFLICT
     assert response.json() == {
-        'detail': 'User with this email already exists',
+        'detail': 'User already exists in the MADR',
     }
 
 
