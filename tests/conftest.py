@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
 from mader.app import app
 from mader.database import get_session
-from mader.models import Romancist, User, table_registry
+from mader.models import Book, Romancist, User, table_registry
 from mader.security import get_password_hash
 
 
@@ -23,6 +23,15 @@ class RomancistFactory(factory.Factory):
         model = Romancist
 
     name = factory.Sequence(lambda n: f'romancist{n}')
+
+
+class BookFactory(factory.Factory):
+    class Meta:
+        model = Book
+
+    title = factory.Sequence(lambda n: f'book{n}')
+    year = factory.Sequence(lambda n: f'{n}')
+    romancist_id = 1
 
 
 @pytest_asyncio.fixture
@@ -95,3 +104,23 @@ async def romancist(session):
     await session.commit()
     await session.refresh(romancist_db)
     return romancist_db
+
+
+@pytest_asyncio.fixture
+async def book(session, romancist):
+    book_db = Book(
+        title='pride and prejudice', year='1813', romancist_id=romancist.id
+    )
+    session.add(book_db)
+    await session.commit()
+    await session.refresh(book_db)
+    return book_db
+
+
+@pytest_asyncio.fixture
+async def book_invalid_romancist(session):
+    book_db = Book(title='pride and prejudice', year='1813', romancist_id=1)
+    session.add(book_db)
+    await session.commit()
+    await session.refresh(book_db)
+    return book_db

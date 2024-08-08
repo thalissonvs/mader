@@ -164,3 +164,14 @@ def test_update_romancist_unauthorized(client, romancist):
 
     assert response.status_code == HTTPStatus.UNAUTHORIZED
     assert response.json() == {'detail': 'Unauthorized'}
+
+
+def test_update_romancist_with_no_data(client, romancist, token):
+    response = client.patch(
+        f'/romancists/{romancist.id}',
+        json={},
+        headers={'Authorization': f'Bearer {token}'},
+    )
+
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == {'id': 1, 'name': 'jane austen'}

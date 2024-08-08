@@ -40,12 +40,22 @@ class BookPublic(BookSchema):
     id: int
 
 
+class BooksList(BaseModel):
+    books: list[BookPublic]
+
+
 class RomancistsList(BaseModel):
     romancists: list[RomancistPublic]
 
 
 class RomancistUpdate(BaseModel):
-    name: str | None
+    name: str | None = None
+
+
+class BookUpdate(BaseModel):
+    title: str | None = None
+    year: str | None = None
+    romancist_id: int | None = None
 
 
 class Message(BaseModel):
