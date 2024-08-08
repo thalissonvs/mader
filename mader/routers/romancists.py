@@ -1,12 +1,10 @@
 from http import HTTPStatus
-from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from mader.database import get_session
-from mader.models import Romancist, User
+from mader.common import T_CurrentUser, T_Session
+from mader.models import Romancist
 from mader.schemas import (
     Message,
     RomancistPublic,
@@ -14,12 +12,9 @@ from mader.schemas import (
     RomancistsList,
     RomancistUpdate,
 )
-from mader.security import get_current_user
 from mader.utils import sanitize_username
 
 router = APIRouter(prefix='/romancists', tags=['romancists'])
-T_Session = Annotated[AsyncSession, Depends(get_session)]
-T_CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
 @router.post(

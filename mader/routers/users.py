@@ -1,19 +1,15 @@
 from http import HTTPStatus
-from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from mader.database import get_session
+from mader.common import T_CurrentUser, T_Session
 from mader.models import User
 from mader.schemas import UserPublic, UserSchema, UsersList
-from mader.security import get_current_user, get_password_hash
+from mader.security import get_password_hash
 from mader.utils import sanitize_username
 
 router = APIRouter(prefix='/users', tags=['users'])
-T_Session = Annotated[AsyncSession, Depends(get_session)]
-T_CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
 @router.post('/', status_code=HTTPStatus.CREATED, response_model=UserPublic)

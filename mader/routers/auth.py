@@ -1,11 +1,7 @@
-from typing import Annotated
-
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from mader.database import get_session
+from mader.common import T_Oauth2Form, T_Session
 from mader.models import User
 from mader.schemas import TokenSchema
 from mader.security import (
@@ -15,8 +11,6 @@ from mader.security import (
 )
 
 router = APIRouter(prefix='/auth', tags=['auth'])
-T_Session = Annotated[AsyncSession, Depends(get_session)]
-T_Oauth2Form = Annotated[OAuth2PasswordRequestForm, Depends()]
 
 
 @router.post('/token', response_model=TokenSchema)
