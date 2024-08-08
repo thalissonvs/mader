@@ -2,6 +2,7 @@ import factory
 import pytest_asyncio
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from testcontainers.postgres import PostgresContainer
 
 from mader.app import app
 from mader.database import get_session
@@ -34,10 +35,16 @@ class BookFactory(factory.Factory):
     romancist_id = 1
 
 
-@pytest_asyncio.fixture
-async def session():
-    engine = create_async_engine('sqlite+aiosqlite:///:memory:')
+@pytest_asyncio.fixture(scope='session')
+async def engine():
+    with PostgresContainer(driver='psycopg') as container:
+        engine = create_async_engine(container.get_connection_url())
+        async with engine.begin():
+            yield engine
 
+
+@pytest_asyncio.fixture
+async def session(engine):
     async with engine.begin() as conn:
         await conn.run_sync(table_registry.metadata.create_all)
 
@@ -111,15 +118,6 @@ async def book(session, romancist):
     book_db = Book(
         title='pride and prejudice', year='1813', romancist_id=romancist.id
     )
-    session.add(book_db)
-    await session.commit()
-    await session.refresh(book_db)
-    return book_db
-
-
-@pytest_asyncio.fixture
-async def book_invalid_romancist(session):
-    book_db = Book(title='pride and prejudice', year='1813', romancist_id=1)
     session.add(book_db)
     await session.commit()
     await session.refresh(book_db)

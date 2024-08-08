@@ -118,7 +118,7 @@ def test_read_books_with_no_books(client):
 
 
 @pytest.mark.asyncio
-async def test_read_books_with_title(client, session):
+async def test_read_books_with_title(client, session, romancist):
     session.add_all(BookFactory.build_batch(5))
     await session.commit()
 
@@ -132,7 +132,7 @@ async def test_read_books_with_title(client, session):
 
 
 @pytest.mark.asyncio
-async def test_read_books_with_year(client, session):
+async def test_read_books_with_year(client, session, romancist):
     expected_books = 5
     session.add_all(BookFactory.build_batch(5, year='1900'))
     await session.commit()
@@ -144,7 +144,7 @@ async def test_read_books_with_year(client, session):
 
 
 @pytest.mark.asyncio
-async def test_read_books_with_title_and_year(client, session):
+async def test_read_books_with_title_and_year(client, session, romancist):
     expected_books = 1
     session.add_all(BookFactory.build_batch(5, year='1900'))
     await session.commit()
@@ -156,7 +156,9 @@ async def test_read_books_with_title_and_year(client, session):
 
 
 @pytest.mark.asyncio
-async def test_read_books_with_title_and_year_should_return_0(client, session):
+async def test_read_books_with_title_and_year_should_return_0(
+    client, session, romancist
+):
     expected_books = 0
     session.add_all(BookFactory.build_batch(5, year='1900'))
     await session.commit()
@@ -168,7 +170,7 @@ async def test_read_books_with_title_and_year_should_return_0(client, session):
 
 
 @pytest.mark.asyncio
-async def test_read_books_with_limit(client, session):
+async def test_read_books_with_limit(client, session, romancist):
     expected_books = 20
     session.add_all(BookFactory.build_batch(25))
     await session.commit()
@@ -179,7 +181,7 @@ async def test_read_books_with_limit(client, session):
 
 
 @pytest.mark.asyncio
-async def test_read_books_with_limit_and_offset(client, session):
+async def test_read_books_with_limit_and_offset(client, session, romancist):
     expected_books = 5
     session.add_all(BookFactory.build_batch(25))
     await session.commit()
@@ -190,7 +192,9 @@ async def test_read_books_with_limit_and_offset(client, session):
 
 
 @pytest.mark.asyncio
-async def test_read_books_with_limit_and_offset_and_title(client, session):
+async def test_read_books_with_limit_and_offset_and_title(
+    client, session, romancist
+):
     expected_books = 15
     session.add_all(BookFactory.build_batch(25))
     await session.commit()
@@ -225,19 +229,6 @@ def test_update_book_not_found(client, token):
 
     assert response.status_code == HTTPStatus.NOT_FOUND
     assert response.json() == {'detail': 'Book not found'}
-
-
-def test_update_book_romancist_not_found(
-    client, book_invalid_romancist, token
-):
-    response = client.patch(
-        f'/books/{book_invalid_romancist.id}',
-        json={'romancist_id': book_invalid_romancist.romancist_id},
-        headers={'Authorization': f'Bearer {token}'},
-    )
-
-    assert response.status_code == HTTPStatus.NOT_FOUND
-    assert response.json() == {'detail': 'Romancist not found'}
 
 
 def test_update_book_with_no_data(client, book, token):

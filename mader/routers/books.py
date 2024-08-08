@@ -121,16 +121,6 @@ async def update_book(
             detail='Book not found',
         )
 
-    db_romancist = await session.scalar(
-        select(Romancist).where(Romancist.id == db_book.romancist_id)
-    )
-
-    if not db_romancist:
-        raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND,
-            detail='Romancist not found',
-        )
-
     for key, value in book.model_dump(exclude_unset=True).items():
         setattr(db_book, key, value)
 
