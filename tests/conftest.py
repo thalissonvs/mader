@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
 from mader.app import app
 from mader.database import get_session
-from mader.models import User, table_registry
+from mader.models import Romancist, User, table_registry
 from mader.security import get_password_hash
 
 
@@ -16,6 +16,13 @@ class UserFactory(factory.Factory):
     username = factory.Sequence(lambda n: f'user{n}')
     email = factory.LazyAttribute(lambda obj: f'{obj.username}@mail.com')
     password = 'password'
+
+
+class RomancistFactory(factory.Factory):
+    class Meta:
+        model = Romancist
+
+    name = factory.Sequence(lambda n: f'romancist{n}')
 
 
 @pytest_asyncio.fixture
@@ -79,3 +86,12 @@ async def token(client, user):
     )
 
     return response.json().get('access_token')
+
+
+@pytest_asyncio.fixture
+async def romancist(session):
+    romancist_db = Romancist(name='jane austen')
+    session.add(romancist_db)
+    await session.commit()
+    await session.refresh(romancist_db)
+    return romancist_db
