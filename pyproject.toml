@@ -9,13 +9,16 @@ readme = "README.md"
 python = "^3.12"
 fastapi = {extras = ["standard"], version = "^0.112.0"}
 pydantic-settings = "^2.4.0"
-sqlalchemy = {extras = ["asyncio"], version = "^2.0.31"}
+sqlalchemy = "2.0.29"
 aiosqlite = "^0.20.0"
 pyjwt = "^2.9.0"
 pwdlib = {extras = ["argon2"], version = "^0.2.0"}
 coverage = "^7.6.0"
 psycopg = {extras = ["binary"], version = "^3.2.1"}
 
+[tool.poetry.group.otel.dependencies]
+opentelemetry-distro = "0.45b0"
+opentelemetry-exporter-otlp = "1.24.0"
 
 [tool.ruff]
 line-length = 79
